@@ -1,5 +1,7 @@
 # Plain Craft Launcher 2 完全开源版
 
+dev：gpt-5.5
+
 本项目允许修改主题，与原版 PCL2 独立，并采用 MIT 开源协议。
 
 [![Build](https://github.com/CortexaX/PCL/actions/workflows/build.yml/badge.svg)](https://github.com/CortexaX/PCL/actions/workflows/build.yml)
