@@ -1,21 +1,21 @@
-# Plain Craft Launcher 2 完全开源版
+# OpenPCL
 
 dev：gpt-5.5
 
 本项目允许修改主题，与原版 PCL2 独立，并采用 MIT 开源协议。
 
-[![Build](https://github.com/CortexaX/PCL/actions/workflows/build.yml/badge.svg)](https://github.com/CortexaX/PCL/actions/workflows/build.yml)
-[![Pages](https://github.com/CortexaX/PCL/actions/workflows/pages.yml/badge.svg)](https://github.com/CortexaX/PCL/actions/workflows/pages.yml)
-[![Release](https://img.shields.io/github/v/release/CortexaX/PCL?label=Release)](https://github.com/CortexaX/PCL/releases)
-[![Stars](https://img.shields.io/github/stars/CortexaX/PCL?style=flat&label=Stars)](https://github.com/CortexaX/PCL)
+[![Build](https://github.com/CortexaX/OpenPCL/actions/workflows/build.yml/badge.svg)](https://github.com/CortexaX/OpenPCL/actions/workflows/build.yml)
+[![Pages](https://github.com/CortexaX/OpenPCL/actions/workflows/pages.yml/badge.svg)](https://github.com/CortexaX/OpenPCL/actions/workflows/pages.yml)
+[![Release](https://img.shields.io/github/v/release/CortexaX/OpenPCL?label=Release)](https://github.com/CortexaX/OpenPCL/releases)
+[![Stars](https://img.shields.io/github/stars/CortexaX/OpenPCL?style=flat&label=Stars)](https://github.com/CortexaX/OpenPCL)
 
 <p align="center">
-  <img src="docs/assets/pcl-cover.jpg" alt="Plain Craft Launcher 2 完全开源版" width="760">
+  <img src="docs/assets/pcl-cover.jpg" alt="OpenPCL" width="760">
 </p>
 
 这是一个第三方基于 Plain Craft Launcher 2 整理、恢复和维护的完全开源版本。项目目标是让 PCL2 的源码、构建流程和发布产物都保持公开、可审计、可复现，方便学习、研究、构建和二次开发。
 
-项目网页：https://cortexax.github.io/PCL/
+项目网页：https://cortexax.github.io/OpenPCL/
 
 本仓库不是官方 PCL2 项目，不代表原作者或官方社区立场。Plain Craft Launcher、PCL、PCL2 等名称及相关权益归原作者与对应权利人所有。具体使用、分发和二次创作规则请以仓库中的 [LICENCE](LICENCE) 以及各第三方组件许可证为准。
 
@@ -31,18 +31,18 @@ dev：gpt-5.5
 
 点下面的分支名可以直接跳转到对应源码快照：
 
-- [`main`](https://github.com/CortexaX/PCL/tree/main)：当前继续维护的完全开源正式分支，最新正式发布为 [v2.13.0.1-cortexa.2](https://github.com/CortexaX/PCL/releases/tag/v2.13.0.1-cortexa.2)。这一版默认使用内部 VB/.NET Taowa 联机实现，构建产物不再包含 `terracotta.exe` 与 `VCRUNTIME140.DLL`。
-- [`reference/v2.13.0.1-cortexa.1`](https://github.com/CortexaX/PCL/tree/reference/v2.13.0.1-cortexa.1)：旧正式版参考分支，对应 [v2.13.0.1-cortexa.1](https://github.com/CortexaX/PCL/releases/tag/v2.13.0.1-cortexa.1) 与提交 `d58a27b0e28704b132c3740590a6bad2b78c3eee`。这个分支保留给需要对照旧正式版恢复过程、行为差异或迁移改动的人参考。
-- [`reference/v2.13.0.1-taowa-test.1`](https://github.com/CortexaX/PCL/tree/reference/v2.13.0.1-taowa-test.1)：Taowa 测试版参考分支，对应 [v2.13.0.1-taowa-test.1](https://github.com/CortexaX/PCL/releases/tag/v2.13.0.1-taowa-test.1) 与提交 `543ad27bc262651becda51029af29958908af3b1`。
-- [`reference/v2.13.0.1-taowa-test.2`](https://github.com/CortexaX/PCL/tree/reference/v2.13.0.1-taowa-test.2)：Taowa 测试版 source.2 参考分支，对应 [v2.13.0.1-taowa-test.2](https://github.com/CortexaX/PCL/releases/tag/v2.13.0.1-taowa-test.2) 与提交 `d08a4f6ccb300e996c3195f3fe196b45bdf4594a`。这两个测试版分支用于对照原测试版联机恢复逻辑和后续内部化迁移差异。
+- [`main`](https://github.com/CortexaX/OpenPCL/tree/main)：当前继续维护的完全开源正式分支，最新正式发布为 [v2.13.0.1-cortexa.2](https://github.com/CortexaX/OpenPCL/releases/tag/v2.13.0.1-cortexa.2)。这一版默认使用内部 VB/.NET Taowa 联机实现，构建产物不再包含 `terracotta.exe` 与 `VCRUNTIME140.DLL`。
+- [`reference/v2.13.0.1-cortexa.1`](https://github.com/CortexaX/OpenPCL/tree/reference/v2.13.0.1-cortexa.1)：旧正式版参考分支，对应 [v2.13.0.1-cortexa.1](https://github.com/CortexaX/OpenPCL/releases/tag/v2.13.0.1-cortexa.1) 与提交 `d58a27b0e28704b132c3740590a6bad2b78c3eee`。这个分支保留给需要对照旧正式版恢复过程、行为差异或迁移改动的人参考。
+- [`reference/v2.13.0.1-taowa-test.1`](https://github.com/CortexaX/OpenPCL/tree/reference/v2.13.0.1-taowa-test.1)：Taowa 测试版参考分支，对应 [v2.13.0.1-taowa-test.1](https://github.com/CortexaX/OpenPCL/releases/tag/v2.13.0.1-taowa-test.1) 与提交 `543ad27bc262651becda51029af29958908af3b1`。
+- [`reference/v2.13.0.1-taowa-test.2`](https://github.com/CortexaX/OpenPCL/tree/reference/v2.13.0.1-taowa-test.2)：Taowa 测试版 source.2 参考分支，对应 [v2.13.0.1-taowa-test.2](https://github.com/CortexaX/OpenPCL/releases/tag/v2.13.0.1-taowa-test.2) 与提交 `d08a4f6ccb300e996c3195f3fe196b45bdf4594a`。这两个测试版分支用于对照原测试版联机恢复逻辑和后续内部化迁移差异。
 
 ## 构建
 
 推荐使用 Windows 与 Visual Studio Build Tools / MSBuild 构建：
 
 ```powershell
-git clone https://github.com/CortexaX/PCL.git
-cd PCL
+git clone https://github.com/CortexaX/OpenPCL.git
+cd OpenPCL
 git submodule update --init --recursive
 msbuild "Plain Craft Launcher 2.sln" /t:Restore /p:Configuration=Release /p:Platform="Any CPU"
 msbuild "Plain Craft Launcher 2.sln" /m /p:Configuration=Release /p:Platform="Any CPU"
@@ -50,8 +50,8 @@ msbuild "Plain Craft Launcher 2.sln" /m /p:Configuration=Release /p:Platform="An
 
 也可以直接查看 GitHub Actions 中的构建记录与发布产物：
 
-- Actions: https://github.com/CortexaX/PCL/actions
-- Releases: https://github.com/CortexaX/PCL/releases
+- Actions: https://github.com/CortexaX/OpenPCL/actions
+- Releases: https://github.com/CortexaX/OpenPCL/releases
 
 ## 致谢
 
