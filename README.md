@@ -1,6 +1,6 @@
 # OpenPCL
 
-dev：gpt-5.5
+dev：gpt-5.5, gpt-5.6-sol, gpt-5.6-luna
 
 本项目允许修改主题，与原版 PCL2 独立，并采用 MIT 开源协议。
 
