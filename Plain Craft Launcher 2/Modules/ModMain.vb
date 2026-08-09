@@ -406,6 +406,8 @@ EndHint:
     Public FrmLoginAuthSkin As PageLoginAuthSkin
     Public FrmLoginMs As PageLoginMs
     Public FrmLoginMsSkin As PageLoginMsSkin
+    Public FrmLoginAccessToken As PageLoginAccessToken
+    Public FrmLoginAccessTokenSkin As PageLoginAccessTokenSkin
 
     '版本设置页面声明
     Public FrmInstanceLeft As PageInstanceLeft
@@ -882,6 +884,8 @@ NextFile:
                     Text = Text.Replace("{login}", Replacer("离线"))
                 Case McLoginType.Ms
                     Text = Text.Replace("{login}", Replacer("正版"))
+                Case McLoginType.AccessToken
+                    Text = Text.Replace("{login}", Replacer("Access Token"))
                 Case McLoginType.Nide
                     Text = Text.Replace("{login}", Replacer("统一通行证"))
                 Case McLoginType.Auth

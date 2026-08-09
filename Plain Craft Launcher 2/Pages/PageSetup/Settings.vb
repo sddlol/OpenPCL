@@ -76,6 +76,10 @@ Public Class Settings
         New Setting("LoginRemember", True, Source:=Sources.Registry, Encrypted:=True),
         New Setting("LoginLegacyName", "", Source:=Sources.Registry, Encrypted:=True),
         New Setting("LoginMsJson", "{}", Source:=Sources.Registry, Encrypted:=True), '{UserName: OAuthToken, ...}
+        New Setting("LoginAccessToken", "", Source:=Sources.Registry, Encrypted:=True),
+        New Setting("CacheAccessTokenUuid", "", Source:=Sources.Registry, Encrypted:=True),
+        New Setting("CacheAccessTokenName", "", Source:=Sources.Registry, Encrypted:=True),
+        New Setting("CacheAccessTokenProfileJson", "", Source:=Sources.Registry, Encrypted:=True),
         New Setting("LoginNideEmail", "", Source:=Sources.Registry, Encrypted:=True),
         New Setting("LoginNidePass", "", Source:=Sources.Registry, Encrypted:=True),
         New Setting("LoginAuthEmail", "", Source:=Sources.Registry, Encrypted:=True),
