@@ -5,6 +5,7 @@
 [![Build](https://github.com/sddlol/OpenPCL/actions/workflows/build.yml/badge.svg)](https://github.com/sddlol/OpenPCL/actions/workflows/build.yml)
 [![Pages](https://github.com/sddlol/OpenPCL/actions/workflows/pages.yml/badge.svg)](https://github.com/sddlol/OpenPCL/actions/workflows/pages.yml)
 [![Release](https://img.shields.io/github/v/release/sddlol/OpenPCL?label=Release)](https://github.com/sddlol/OpenPCL/releases)
+[![Latest Release](https://img.shields.io/github/v/release/sddlol/OpenPCL?label=Release)](https://github.com/sddlol/OpenPCL/releases/latest)
 [![Stars](https://img.shields.io/github/stars/sddlol/OpenPCL?style=flat&label=Stars)](https://github.com/sddlol/OpenPCL)
 
 <p align="center">
