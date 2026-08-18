@@ -15,9 +15,17 @@
             <RowDefinition Height="19" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="1" VerticalAlignment="Center" Name="TextName" Text="加载中" Margin="8,0" FontSize="17"
-                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis">
+            <TextBlock.RenderTransform>
+                <TranslateTransform Y="15" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
         <TextBlock Grid.Row="2" Name="TextTokenInfo" Text="到期时间：未知&#xA;剩余时间：未知" FontSize="11" LineHeight="15"
-                   HorizontalAlignment="Center" TextAlignment="Center" Foreground="{DynamicResource ColorBrushGray3}" />
+                   HorizontalAlignment="Center" TextAlignment="Center" Foreground="{DynamicResource ColorBrushGray3}">
+            <TextBlock.RenderTransform>
+                <TranslateTransform Y="15" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
         <Border Grid.Row="4" HorizontalAlignment="Center" x:Name="PanButtons" Opacity="0"
                 CornerRadius="5" Background="{DynamicResource ColorBrush8}" Padding="10,3,9,3">
             <StackPanel Orientation="Horizontal">
@@ -47,5 +55,13 @@
             </StackPanel>
         </Border>
     </Grid>
-    <local:MySkin HorizontalAlignment="Center" VerticalAlignment="Top" x:Name="Skin" HasCape="False" IsHitTestVisible="False" />
+    <Grid Width="64" Height="64" HorizontalAlignment="Center" VerticalAlignment="Top" IsHitTestVisible="False" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderTransformOrigin="0.5,0">
+        <Grid.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform ScaleX="1.1666667" ScaleY="1.1666667" />
+                <TranslateTransform Y="15" />
+            </TransformGroup>
+        </Grid.RenderTransform>
+        <local:MySkin x:Name="Skin" HasCape="False" IsHitTestVisible="False" />
+    </Grid>
 </Grid>
