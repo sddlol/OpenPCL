@@ -109,7 +109,7 @@ Public Class PageLaunchLeft
 
         '改变页面
         Dim LoginType = Settings.Get(Of McLoginType)("LoginType")
-        If LoginType = McLoginType.Legacy OrElse LoginType = McLoginType.Ms Then CType(FindName("RadioLoginType" & LoginType), MyRadioButton).Checked = True
+        If {McLoginType.Legacy, McLoginType.Ms, McLoginType.AccessToken}.Contains(LoginType) Then CType(FindName("RadioLoginType" & LoginType), MyRadioButton).Checked = True
         RefreshPage(False, False)
 
         AniControlEnabled -= 1
@@ -127,6 +127,8 @@ Public Class PageLaunchLeft
                 LabLaunchingMethod.Text = "离线登录"
             Case McLoginType.Ms
                 LabLaunchingMethod.Text = "正版登录"
+            Case McLoginType.AccessToken
+                LabLaunchingMethod.Text = "Access Token"
             Case McLoginType.Nide
                 LabLaunchingMethod.Text = "统一通行证"
             Case McLoginType.Auth
@@ -200,6 +202,8 @@ Public Class PageLaunchLeft
         AuthSkin
         Ms
         MsSkin
+        AccessToken
+        AccessTokenSkin
     End Enum
     ''' <summary>
     ''' 当前页面的种类。
@@ -229,6 +233,12 @@ Public Class PageLaunchLeft
             Case PageType.MsSkin
                 If IsNothing(FrmLoginMsSkin) Then FrmLoginMsSkin = New PageLoginMsSkin
                 Return FrmLoginMsSkin
+            Case PageType.AccessToken
+                If IsNothing(FrmLoginAccessToken) Then FrmLoginAccessToken = New PageLoginAccessToken
+                Return FrmLoginAccessToken
+            Case PageType.AccessTokenSkin
+                If IsNothing(FrmLoginAccessTokenSkin) Then FrmLoginAccessTokenSkin = New PageLoginAccessTokenSkin
+                Return FrmLoginAccessTokenSkin
             Case Else
                 Throw New ArgumentOutOfRangeException("Type", "即将切换的登录分页编号越界")
         End Select
@@ -309,6 +319,13 @@ UnknownType:
                         Type = PageType.MsSkin
                     End If
                     Settings.Set("LoginType", McLoginType.Ms)
+                ElseIf RadioLoginType6.Checked Then
+                    If Settings.Get(Of String)("LoginAccessToken") = "" OrElse Settings.Get(Of String)("CacheAccessTokenName") = "" Then
+                        Type = PageType.AccessToken
+                    Else
+                        Type = PageType.AccessTokenSkin
+                    End If
+                    Settings.Set("LoginType", McLoginType.AccessToken)
                 Else
                     Type = PageType.Legacy
                     Settings.Set("LoginType", McLoginType.Legacy)
@@ -316,6 +333,7 @@ UnknownType:
                 PanType.Visibility = Visibility.Visible
                 PanTypeOne.Visibility = Visibility.Collapsed
                 RadioLoginType5.Visibility = Visibility.Visible
+                RadioLoginType6.Visibility = Visibility.Visible
                 RadioLoginType0.Visibility = Visibility.Visible
             Case 1 '仅正版
                 If Settings.Get(Of String)("CacheMsV2Access") = "" Then
@@ -329,12 +347,14 @@ UnknownType:
                 PathTypeOne.Data = (New GeometryConverter).ConvertFromString(Logo.IconButtonShield)
                 LabTypeOne.Text = "正版登录"
                 RadioLoginType5.Visibility = Visibility.Visible
+                RadioLoginType6.Visibility = Visibility.Collapsed
                 RadioLoginType0.Visibility = Visibility.Collapsed
             Case 2 '仅离线
                 Type = PageType.Legacy
                 Settings.Set("LoginType", McLoginType.Legacy)
                 PanType.Visibility = Visibility.Collapsed
                 PanTypeOne.Visibility = Visibility.Visible
+                RadioLoginType6.Visibility = Visibility.Collapsed
                 PathTypeOne.Data = (New GeometryConverter).ConvertFromString(Logo.IconButtonOffline)
                 LabTypeOne.Text = "离线登录"
             Case 3 '统一通行证
@@ -370,7 +390,7 @@ UnknownType:
         Dim Control As MyRadioButton = FindName("RadioLoginType" & Settings.Get(Of McLoginType)("LoginType"))
         If Control IsNot Nothing Then Control.Checked = True
     End Sub
-    Private Sub RadioLoginType_Change(sender As Object, raiseByMouse As Boolean) Handles RadioLoginType0.Check, RadioLoginType5.Check
+    Private Sub RadioLoginType_Change(sender As Object, raiseByMouse As Boolean) Handles RadioLoginType0.Check, RadioLoginType5.Check, RadioLoginType6.Check
         If raiseByMouse Then RefreshPage(True, True)
     End Sub
 
@@ -423,6 +443,39 @@ Finish:
             RunInUi(AddressOf FrmLoginMsSkin.Skin.Load)
         ElseIf Not Data.IsCanceled Then '如果已经中断，Input 也被清空，就不会再次刷新
             Data.Input = Nothing '清空输入，因为皮肤实际上没有被渲染，如果不清空切换到页面的 Start 会由于输入相同而不渲染
+        End If
+    End Sub
+
+    'Access Token 正版皮肤
+    Public Shared SkinAccessToken As New LoaderTask(Of (String, String), String)("Loader Skin Access Token", AddressOf SkinAccessTokenLoad, AddressOf SkinAccessTokenInput, ThreadPriority.AboveNormal)
+    Private Shared Function SkinAccessTokenInput() As (String, String)
+        Return (Settings.Get(Of String)("CacheAccessTokenName"), Settings.Get(Of String)("CacheAccessTokenUuid"))
+    End Function
+    Private Shared Sub SkinAccessTokenLoad(Data As LoaderTask(Of (String, String), String))
+        RunInUi(Sub() If FrmLoginAccessTokenSkin IsNot Nothing AndAlso FrmLoginAccessTokenSkin.Skin IsNot Nothing Then FrmLoginAccessTokenSkin.Skin.Clear())
+        Dim UserName As String = Data.Input.Item1
+        Dim Uuid As String = Data.Input.Item2
+        If UserName = "" OrElse Uuid = "" Then
+            Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(UserName)) & ".png"
+            GoTo Finish
+        End If
+        Try
+            Dim Result As String = McSkinGetAddress(Uuid, "Ms")
+            If Data.IsCanceled Then Throw New OperationCanceledException("当前任务已取消：" & UserName)
+            Data.Output = McSkinDownload(Result)
+        Catch ex As Exception
+            If ex.IsCanceled Then
+                Data.Output = ""
+                Return
+            End If
+            Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(UserName)) & ".png"
+            Logger.Warn(ex, $"获取 Access Token 账号皮肤失败（{UserName}）")
+        End Try
+Finish:
+        If FrmLoginAccessTokenSkin IsNot Nothing Then
+            RunInUi(AddressOf FrmLoginAccessTokenSkin.Skin.Load)
+        ElseIf Not Data.IsCanceled Then
+            Data.Input = Nothing
         End If
     End Sub
 
@@ -598,7 +651,7 @@ Finish:
 
     '全部皮肤加载器
     '需要放在其中元素的后面，否则会因为它提前被加载而莫名其妙变成 Nothing
-    Public Shared SkinLoaders As New List(Of LoaderTask(Of (String, String), String)) From {SkinMs, SkinLegacy, SkinNide, SkinAuth}
+    Public Shared SkinLoaders As New List(Of LoaderTask(Of (String, String), String)) From {SkinMs, SkinAccessToken, SkinLegacy, SkinNide, SkinAuth}
 
 #End Region
 

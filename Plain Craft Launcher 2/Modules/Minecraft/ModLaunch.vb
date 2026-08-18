@@ -252,7 +252,8 @@ NextInner:
         End If
         '正版购买提示
         If CurrentLaunchOptions?.SaveBatch Is Nothing AndAlso '保存脚本时不提示
-           Not Settings.Get(Of Boolean)("HintBuy") AndAlso Settings.Get(Of McLoginType)("LoginType") <> McLoginType.Ms Then
+           Not Settings.Get(Of Boolean)("HintBuy") AndAlso
+           Not {McLoginType.Ms, McLoginType.AccessToken}.Contains(Settings.Get(Of McLoginType)("LoginType")) Then
             If Globalization.CultureInfo.CurrentCulture.Name.StartsWithF("zh") OrElse Globalization.CultureInfo.CurrentUICulture.Name.StartsWithF("zh") Then '中文？
                 RunInNewThread(
                 Sub()
@@ -289,6 +290,7 @@ NextInner:
         Nide = 2
         Auth = 3
         Ms = 5
+        AccessToken = 6
     End Enum
 
     '各个登录方式的对应数据
@@ -357,6 +359,42 @@ NextInner:
             Return (OAuthRefreshToken & UserName).GetStableHashCode() Mod Integer.MaxValue
         End Function
     End Class
+    Public Class McLoginAccessToken
+        Inherits McLoginData
+
+        Public AccessToken As String = ""
+
+        Public Sub New()
+            Type = McLoginType.AccessToken
+        End Sub
+        Public Overrides Function GetHashCode() As Integer
+            Return (AccessToken & Type).GetStableHashCode() Mod Integer.MaxValue
+        End Function
+    End Class
+
+    ''' <summary>
+    ''' 获取 Minecraft Access Token JWT 中的过期时间。非 JWT 或缺少 exp 时返回 Long.MinValue。
+    ''' </summary>
+    Public Function McLoginAccessTokenExpires(AccessToken As String) As Long
+        ' ponytail: opaque tokens show unknown; rely on profile validation until an introspection endpoint exists.
+        Try
+            Dim Parts = AccessToken.Trim.Split("."c)
+            If Parts.Length < 2 Then Return Long.MinValue
+            Dim Payload = Parts(1).Replace("-", "+").Replace("_", "/")
+            Select Case Payload.Length Mod 4
+                Case 2
+                    Payload &= "=="
+                Case 3
+                    Payload &= "="
+                Case 1
+                    Return Long.MinValue
+            End Select
+            Dim Claims As JObject = Encoding.UTF8.GetString(Convert.FromBase64String(Payload)).DeserializeJson()
+            Return If(Claims("exp") Is Nothing, Long.MinValue, Claims("exp").ToObject(Of Long))
+        Catch
+            Return Long.MinValue
+        End Try
+    End Function
     Public Class McLoginLegacy
         Inherits McLoginData
         ''' <summary>
@@ -401,6 +439,8 @@ NextInner:
         Select Case Settings.Get(Of McLoginType)("LoginType")
             Case McLoginType.Ms
                 If Settings.Get(Of String)("CacheMsV2Name") <> "" Then Return Settings.Get(Of String)("CacheMsV2Name")
+            Case McLoginType.AccessToken
+                If Settings.Get(Of String)("CacheAccessTokenName") <> "" Then Return Settings.Get(Of String)("CacheAccessTokenName")
             Case McLoginType.Legacy
                 If Settings.Get(Of String)("LoginLegacyName") <> "" Then Return Settings.Get(Of String)("LoginLegacyName").ToString.BeforeFirst("¨")
             Case McLoginType.Nide
@@ -410,6 +450,7 @@ NextInner:
         End Select
         '查找所有可能的项
         If Settings.Get(Of String)("CacheMsV2Name") <> "" Then Return Settings.Get(Of String)("CacheMsV2Name")
+        If Settings.Get(Of String)("CacheAccessTokenName") <> "" Then Return Settings.Get(Of String)("CacheAccessTokenName")
         If Settings.Get(Of String)("CacheNideName") <> "" Then Return Settings.Get(Of String)("CacheNideName")
         If Settings.Get(Of String)("CacheAuthName") <> "" Then Return Settings.Get(Of String)("CacheAuthName")
         If Settings.Get(Of String)("LoginLegacyName") <> "" Then Return Settings.Get(Of String)("LoginLegacyName").ToString.BeforeFirst("¨")
@@ -426,6 +467,8 @@ NextInner:
                 Else
                     Return ""
                 End If
+            Case McLoginType.AccessToken
+                Return PageLoginAccessToken.IsVaild(PageLoginAccessToken.GetLoginData())
             Case McLoginType.Legacy
                 Return FrmLoginLegacy.IsVaild()
             Case McLoginType.Nide
@@ -451,6 +494,8 @@ NextInner:
         Select Case LoginData.Type
             Case McLoginType.Ms
                 Return PageLoginMs.IsVaild(LoginData)
+            Case McLoginType.AccessToken
+                Return PageLoginAccessToken.IsVaild(LoginData)
             Case McLoginType.Legacy
                 Return PageLoginLegacy.IsVaild(LoginData)
             Case McLoginType.Nide
@@ -477,6 +522,8 @@ NextInner:
                     Else
                         LoginData = PageLoginMsSkin.GetLoginData()
                     End If
+                Case McLoginType.AccessToken
+                    LoginData = PageLoginAccessToken.GetLoginData()
                 Case McLoginType.Nide
                     If Settings.Get(Of String)("CacheNideAccess") = "" Then
                         LoginData = PageLoginNide.GetLoginData()
@@ -505,6 +552,8 @@ NextInner:
         Select Case Data.Input.Type
             Case McLoginType.Ms
                 Loader = McLoginMsLoader
+            Case McLoginType.AccessToken
+                Loader = McLoginAccessTokenLoader
             Case McLoginType.Legacy
                 Loader = McLoginLegacyLoader
             Case McLoginType.Nide
@@ -524,6 +573,7 @@ NextInner:
 
     '各个登录方式的主对象与输入构造
     Public McLoginMsLoader As New LoaderTask(Of McLoginMs, McLoginResult)("Loader Login Ms", AddressOf McLoginMsStart) With {.ReloadTimeout = 1}
+    Public McLoginAccessTokenLoader As New LoaderTask(Of McLoginAccessToken, McLoginResult)("Loader Login Access Token", AddressOf McLoginAccessTokenStart) With {.ReloadTimeout = 1}
     Public McLoginLegacyLoader As New LoaderTask(Of McLoginLegacy, McLoginResult)("Loader Login Legacy", AddressOf McLoginLegacyStart)
     Public McLoginNideLoader As New LoaderTask(Of McLoginServer, McLoginResult)("Loader Login Nide", AddressOf McLoginServerStart) With {.ReloadTimeout = 1000 * 60 * 10}
     Public McLoginAuthLoader As New LoaderTask(Of McLoginServer, McLoginResult)("Loader Login Auth", AddressOf McLoginServerStart) With {.ReloadTimeout = 1000 * 60 * 10}
@@ -597,6 +647,43 @@ SkipLogin:
         McLaunchLog($"微软登录结束，AccessToken 将在 {DateTimeOffset.FromUnixTimeSeconds(ExpiresAt).LocalDateTime} 过期")
         Settings.Set("HintBuy", True) '关闭正版购买提示
         If ThemeUnlock(10, False) Then MyMsgBox("感谢你对正版游戏的支持！" & vbCrLf & "隐藏主题 跳票红 已解锁！", "提示")
+    End Sub
+    Private Sub McLoginAccessTokenStart(Data As LoaderTask(Of McLoginAccessToken, McLoginResult))
+        Dim Input As McLoginAccessToken = Data.Input
+        McLaunchLog("登录方式：Access Token")
+        Data.Progress = 0.1
+        If Data.IsCanceled Then Throw New OperationCanceledException
+
+        Dim ExpiresAt = McLoginAccessTokenExpires(Input.AccessToken)
+        If ExpiresAt <> Long.MinValue AndAlso ExpiresAt <= GetUnixTimestampUtc() Then
+            Throw New Exception("Access Token 已过期，请重新输入！")
+        End If
+
+        Dim Result As (UUID As String, UserName As String, ProfileJson As String)
+        Try
+            Result = MsLoginStep6(Input.AccessToken)
+        Catch ex As HttpRequestCodeException When ex.StatusCode = HttpStatusCode.Unauthorized
+            Throw New Exception("Access Token 已过期或无效，请重新输入！", ex)
+        End Try
+        Data.Progress = 0.9
+        If Data.IsCanceled Then Throw New OperationCanceledException
+
+        Settings.Set("LoginAccessToken", Input.AccessToken)
+        Settings.Set("CacheAccessTokenUuid", Result.UUID)
+        Settings.Set("CacheAccessTokenName", Result.UserName)
+        Settings.Set("CacheAccessTokenProfileJson", Result.ProfileJson)
+        Settings.Set("CacheAccessTokenExpires", ExpiresAt)
+        Data.Output = New McLoginResult With {
+            .AccessToken = Input.AccessToken,
+            .Name = Result.UserName,
+            .Uuid = Result.UUID,
+            .Type = "Microsoft",
+            .ClientToken = Result.UUID,
+            .ProfileJson = Result.ProfileJson
+        }
+        Data.Progress = 1
+        Settings.Set("HintBuy", True)
+        McLaunchLog($"Access Token 登录结束（{Result.UserName}）")
     End Sub
     Private Sub McLoginServerStart(Data As LoaderTask(Of McLoginServer, McLoginResult))
         Dim Input As McLoginServer = Data.Input

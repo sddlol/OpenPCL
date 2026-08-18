@@ -301,6 +301,12 @@
     <Compile Include="Pages\PageLaunch\PageLoginMs.xaml.vb">
       <DependentUpon>PageLoginMs.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\PageLaunch\PageLoginAccessToken.xaml.vb">
+      <DependentUpon>PageLoginAccessToken.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\PageLaunch\PageLoginAccessTokenSkin.xaml.vb">
+      <DependentUpon>PageLoginAccessTokenSkin.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\PageLaunch\PageLoginMsSkin.xaml.vb">
       <DependentUpon>PageLoginMsSkin.xaml</DependentUpon>
     </Compile>
@@ -552,6 +558,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageLaunch\PageLoginMs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\PageLaunch\PageLoginAccessToken.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\PageLaunch\PageLoginAccessTokenSkin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
